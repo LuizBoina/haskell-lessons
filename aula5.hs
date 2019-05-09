@@ -115,3 +115,14 @@ mSI xs maiorSeq
         | otherwise = mSI resto maiorSeq
         where seqAtual = pegar' (==(head xs)) xs
               resto = dropar (==(head xs)) xs
+
+
+mSI2 f [] maiorSeq = maiorSeq
+mSI2 f (x:xs) maiorSeq
+       | (length $ mayMSeq f (x:xs)) > length maiorSeq = mSI2 f xs (x:mayMSeq f (x:xs))
+       | otherwise = mSI2 f xs maiorSeq
+       where mayMSeq f (x:xs)
+                | length (x:xs) == 1 = []
+                | f x (head xs) = (head xs):(mayMSeq f xs)
+                | otherwise = []
+               
