@@ -1,5 +1,3 @@
-import Data.List.Split
-
 type Pos = (Float, Float)
 origem :: Pos
 origem = (0,0)
@@ -30,6 +28,7 @@ chaveia _ = Desconhecido
 data Figure = Ret (Pos,Pos)
                 | Circ (Pos, Float)
                 | Tri (Pos, Pos, Pos)
+                deriving Show
 
 type Figures = [Figure]
 
@@ -65,6 +64,19 @@ find' (x:xs) y
 
 lerFiguras = do hFigures <- readFile "figures.txt" 
                 let figures = formatFigures hFigures
-                putStrLn (show figures)
-                --writeFile "areas.txt" figures
-                where formatFigures hFigures = map words (splitOn "\n" hFigures)
+                writeFile "areas.txt" figures
+                where formatFigures hFigures =  calcArea $ toFigure $ map words (lines hFigures)
+
+readFloat :: String -> Float
+readFloat = read
+
+toFigure :: [[[Char]]] -> Figures
+toFigure [] = []
+toFigure (fig:figs)
+            | head fig == "Circ" = (Circ ((readFloat (fig!!1), readFloat (fig!!2)),readFloat (fig!!3))):(toFigure figs)
+            | head fig == "Ret" = (Ret ((readFloat (fig!!1), readFloat (fig!!2)), (readFloat (fig!!3), readFloat (fig!!4)))):(toFigure figs)
+            | head fig == "Tri" = (Tri ((readFloat (fig!!1), readFloat (fig!!2)), (readFloat (fig!!3), readFloat (fig!!4)), (readFloat (fig!!5), readFloat (fig!!6)))):(toFigure figs)
+            | otherwise = toFigure figs
+
+calcArea [] = "\n"
+calcArea (fig:figs) = (show $ area fig) ++ "\n" ++ (calcArea figs)
