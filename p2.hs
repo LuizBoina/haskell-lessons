@@ -46,7 +46,7 @@ mover (Tri ((x1,y1),(x2,y2),(x3,y3))) mx my = (Tri ((x1+mx,y1+my),(x2+mx,y2+my),
 
 data Talvez a = Nada
                 | Apenas a
-                deriving Show
+                deriving (Show, Eq)
 
 cabeca :: [a] -> Talvez a
 cabeca [] = Nada
@@ -132,13 +132,13 @@ instance Eq Expr where
 
 data Arv a = Nil
           | No (Arv a) a (Arv a)
-          deriving Show
+          deriving (Show, Eq)
 
 findArv Nil _ = Nada
 findArv (No ra w rb) f
                   | w == f = Apenas f
-                  | not (vazia ra) = findArv ra f
-                  | otherwise = findArv rb f
+                  | findArv ra f /= Nada || findArv rb f /= Nada = Apenas f
+                  | otherwise = Nada
 
 vazia Nil = True
 vazia _ = False
@@ -148,3 +148,17 @@ findArvBin (No ra w rb) f
                   | w == f = Apenas f
                   | f>w = findArvBin rb f
                   | otherwise = findArvBin ra f
+
+addToArvBin Nil f = No Nil f Nil
+addToArvBin (No ra w rb) f
+                  | f >= w = No ra w (addToArvBin rb f)
+                  | otherwise = No (addToArvBin ra f) w rb
+
+inserirRamo Nil Nil = Nil
+inserirRamo Nil (No rq p re) = (No rq p re) 
+inserirRamo (No ra w rb) (No rq p re) = No ra w (inserirRamo rb (No rq p re))
+ 
+remove Nil f = Nil
+remove (No ra w rb) f
+                  | f == w = (inserirRamo ra rb)
+                  | otherwise = (No (remove ra f) w (remove rb f)) 
