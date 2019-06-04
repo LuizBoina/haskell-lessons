@@ -1,3 +1,4 @@
+import Data.List
 type Pos = (Float, Float)
 origem :: Pos
 origem = (0,0)
@@ -162,3 +163,23 @@ remove Nil f = Nil
 remove (No ra w rb) f
                   | f == w = (inserirRamo ra rb)
                   | otherwise = (No (remove ra f) w (remove rb f)) 
+
+insere Nil f = No Nil f Nil
+insere (No ra w rb) f
+              | w == f = (No ra w rb)
+              | f>w = (No ra w (insere rb f))
+              | otherwise = (No (insere ra f) w rb)
+
+emOrdem Nil = []
+emOrdem (No ra w rb) = (emOrdem ra) ++ [w] ++ (emOrdem rb)
+
+preOrdem Nil = []
+preOrdem (No ra w rb) = [w] ++ (preOrdem ra) ++ (preOrdem rb)
+
+posOrdem Nil = []
+posOrdem (No ra w rb) = (posOrdem ra) ++ (posOrdem rb) ++ [w]
+
+proxMedia xs w = 
+media xs = (sum xs)/(length xs)
+lista2Arv xs = (No )
+--(No (No (No Nil 1 Nil) 2 (No Nil 3 Nil)) 4 (No (No Nil 5 Nil) 6 (No Nil 7 Nil)))
