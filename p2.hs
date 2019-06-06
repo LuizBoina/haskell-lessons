@@ -179,7 +179,33 @@ preOrdem (No ra w rb) = [w] ++ (preOrdem ra) ++ (preOrdem rb)
 posOrdem Nil = []
 posOrdem (No ra w rb) = (posOrdem ra) ++ (posOrdem rb) ++ [w]
 
-proxMedia xs w = 
-media xs = (sum xs)/(length xs)
-lista2Arv xs = (No )
---(No (No (No Nil 1 Nil) 2 (No Nil 3 Nil)) 4 (No (No Nil 5 Nil) 6 (No Nil 7 Nil)))
+lista2Arv [x] = No Nil x Nil
+lista2Arv xs = (No (lista2Arv (esquerda sorted)) (central (sorted)) (lista2Arv (direita sorted)))
+            where sorted = sort xs
+                  central xs = xs!!((length xs)`div`2)
+                  esquerda xs = take ((length xs)`div`2) xs
+                  direita xs = drop (((length xs)`div`2)+1) xs
+
+data ArvN a = NilN
+              | NoN a [ArvN a]
+              deriving Show
+
+readInt :: String -> Int
+readInt = read
+
+lerArvN = do hArvN <- readFile "arvn.txt"
+             let arvN =  (map (map readInt) (formatArvN hArvN))
+             let b = arvNGen (head arvN) (tail arvN)
+             writeFile "Oarvn.txt" (show b)
+             where formatArvN a = map words (lines a)
+
+arvNGen  = NoN (head xs) [(arvNGenf (tail xs) xss)] 
+
+
+
+arvNGenf [] _ arv = arv
+arvNGenf (f:fs) (xs:xss) arv
+                | f == head xs = (NoN f [(toArvN (tail xs))])
+                | otherwise = arvNGenf fs xss (NoN f [NilN])
+                where toArvN [x] = NoN x [NilN]
+                      toArvN (x:xs) = NoN x [(toArvN xs)]
